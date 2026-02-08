@@ -20,6 +20,8 @@ site_build
 venv
 docs.zip
 archive.zip
+orders-api/orders.db
+
 
 # vim temporary files
 *~

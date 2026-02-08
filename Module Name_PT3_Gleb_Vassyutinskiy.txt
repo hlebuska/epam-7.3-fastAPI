@@ -1,3 +1,5 @@
+Prefered format (.md)
+
 # GitHub Copilot Metrics Report
 
 ## Project
@@ -47,3 +49,6 @@ Where time was saved most:
 2. Copilot can suggest outdated and deprecated patterns. Some suggestions used deprecated framework/library methods. Verification needed, possible solution: using MCP such as context7 for up to date documentations
 
 3. Generated setup commands sometimes assumed incorrect working directories or virtualenv paths, so environment-aware corrections were required.
+
+## Repo Link 
+https://github.com/hlebuska/epam-7.3-fastAPI

@@ -9,7 +9,7 @@ from .schemas import OrderCreate
 
 
 def create_order(db: Session, order_in: OrderCreate) -> Order:
-    order = Order(status=order_in.status, amount=order_in.amount)
+    order = Order(status=order_in.status.value, amount=order_in.amount)
     db.add(order)
     db.commit()
     db.refresh(order)

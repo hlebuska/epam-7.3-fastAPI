@@ -28,7 +28,7 @@ def create_order(order_in: schemas.OrderCreate, db: Session = Depends(get_db)):
 def list_orders(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1),
-    status: Optional[str] = None,
+    status: Optional[schemas.OrderStatus] = None,
     min_amount: Optional[float] = None,
     max_amount: Optional[float] = None,
     start_date: Optional[datetime] = None,
@@ -39,7 +39,7 @@ def list_orders(
         db=db,
         page=page,
         limit=limit,
-        status=status,
+        status=status.value if status is not None else None,
         min_amount=min_amount,
         max_amount=max_amount,
         start_date=start_date,

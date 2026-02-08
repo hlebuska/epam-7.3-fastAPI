@@ -187,4 +187,16 @@ From project root:
 pytest --cov=orders-api/app --cov-report=term-missing tests/test_orders.py
 ```
 
-Current coverage target: `80%+`.
+Current coverage: `80%+`.
+
+Name                         Stmts   Miss  Cover   Missing
+----------------------------------------------------------
+orders-api/app/__init__.py       0      0   100%
+orders-api/app/crud.py          33      2    94%   30, 32
+orders-api/app/db.py            12      4    67%   22-26
+orders-api/app/main.py          20      0   100%
+orders-api/app/models.py         9      0   100%
+orders-api/app/schemas.py       26      0   100%
+orders-api/app/seed.py          24      2    92%   47-48
+----------------------------------------------------------
+TOTAL                          124      8    94%

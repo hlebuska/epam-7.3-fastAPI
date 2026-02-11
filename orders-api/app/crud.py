@@ -2,28 +2,17 @@ from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import func, select
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from .models import Order
-from .schemas import OrderCreate, OrderStatus
-
-ALLOWED_ORDER_STATUSES = tuple(status.value for status in OrderStatus)
-
-
-class DatabaseOperationError(Exception):
-    pass
+from .schemas import OrderCreate
 
 
 def create_order(db: Session, order_in: OrderCreate) -> Order:
     order = Order(status=order_in.status.value, amount=order_in.amount)
     db.add(order)
-    try:
-        db.commit()
-        db.refresh(order)
-    except SQLAlchemyError as exc:
-        db.rollback()
-        raise DatabaseOperationError("failed to create order") from exc
+    db.commit()
+    db.refresh(order)
     return order
 
 
@@ -42,7 +31,7 @@ def list_orders(
     if limit < 1:
         raise ValueError("limit must be >= 1")
 
-    filters = [Order.status.in_(ALLOWED_ORDER_STATUSES)]
+    filters = []
     if status is not None:
         filters.append(Order.status == status)
     if min_amount is not None:
@@ -55,25 +44,15 @@ def list_orders(
         filters.append(Order.created_at <= end_date)
 
     items_stmt = (
-        select(Order, func.count(Order.id).over().label("total_count"))
+        select(Order)
         .where(*filters)
-        .order_by(Order.created_at.desc(), Order.id.desc())
+        .order_by(Order.created_at.desc())
         .offset((page - 1) * limit)
         .limit(limit)
     )
-    try:
-        rows = db.execute(items_stmt).all()
-    except SQLAlchemyError as exc:
-        raise DatabaseOperationError("failed to list orders") from exc
+    items = db.execute(items_stmt).scalars().all()
 
-    items = [row[0] for row in rows]
-    if rows:
-        total = int(rows[0][1])
-    else:
-        total_stmt = select(func.count(Order.id)).where(*filters)
-        try:
-            total = db.execute(total_stmt).scalar_one()
-        except SQLAlchemyError as exc:
-            raise DatabaseOperationError("failed to count orders") from exc
+    total_stmt = select(func.count(Order.id)).where(*filters)
+    total = db.execute(total_stmt).scalar_one()
 
     return {"items": items, "total": total}
